@@ -2,6 +2,7 @@
 
 namespace CaT\Libs\ExcelWrapper\Spout;
 
+use Box\Spout\Common\Entity\Cell;
 use \CaT\Plugins\MateriaList\ilActions;
 use \CaT\Libs\ExcelWrapper\Writer;
 
@@ -82,7 +83,11 @@ class SpoutCSVWriter implements Writer
      */
     public function addRow(array $values): void
     {
-        $row = new Row($values, null);
+        $cells = array_map(
+            fn ($value) => new Cell($value),
+            $values
+        );
+        $row = new Row($cells, null);
         $this->writer->addRow($row);
     }
 

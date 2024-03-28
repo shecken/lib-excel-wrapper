@@ -115,10 +115,10 @@ class SpoutWriter implements Writer
      */
     public function addRow(array $values): void
     {
-        $cells = [];
-        foreach ($values as $value) {
-            $cells[] = new Cell($value);
-        }
+        $cells = array_map(
+            fn ($value) => new Cell($value),
+            $values
+        );
         $row = new Row($cells, $this->style);
         $this->writer->addRow($row);
     }
