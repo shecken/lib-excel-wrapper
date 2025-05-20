@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
 use \CaT\Libs\ExcelWrapper\Style as CatStyle;

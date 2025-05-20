@@ -132,8 +132,9 @@ class StyleTest extends TestCase
     {
         try {
             $this->style = $this->style->withBackgroundColor("11");
-            $this->assertFalse("Should have raised.");
-        } catch (Exception $e) {
+            $this->fail("Should throw InvalidArgumentException");
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
         }
     }
 
@@ -141,8 +142,9 @@ class StyleTest extends TestCase
     {
         try {
             $this->style = $this->style->withOrientation("untenlinks");
-            $this->assertFalse("Should have raised.");
-        } catch (Exception $e) {
+            $this->fail("Should throw InvalidArgumentException");
+        } catch (InvalidArgumentException $e) {
+            $this->assertTrue(true);
         }
     }
 }
