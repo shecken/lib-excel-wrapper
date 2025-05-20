@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
-use \CaT\Plugins\MateriaList\ilActions;
 use \CaT\Libs\ExcelWrapper\Writer;
 
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Writer\WriterInterface;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Common\Entity\Style\Border;
-use Box\Spout\Common\Entity\Style\BorderPart;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Cell\StringCell;
+use OpenSpout\Writer\WriterInterface;
+use OpenSpout\Common\Entity\Style\Style AS SPOUT_STYLE;
+use OpenSpout\Common\Entity\Style\Border AS SPOUT_BORDER;
+use OpenSpout\Common\Entity\Style\BorderPart;
+use OpenSpout\Writer\XLSX\Writer as XLSXWriter;
 
 /**
  * Export a single material list
@@ -19,153 +20,106 @@ use Box\Spout\Common\Entity\Style\BorderPart;
 class SpoutWriter implements Writer
 {
     protected WriterInterface $writer;
-    protected ?string $file_name = null;
-    protected ?string $file_path = null;
-    protected int $max_column_count;
-    protected Style $style;
+    protected ?SPOUT_STYLE $style = null;
 
-    public function __construct()
+	public function __construct(
+        protected int $max_column_count,
+    ) {
+
+	}
+
+	public function openFile(string $file_path, string $file_name): void
     {
-        $this->writer = WriterEntityFactory::createXLSXWriter();
+        $this->writer = new XLSXWriter();
+        $this->writer->openToFile($file_path.$file_name);
     }
 
-    /**
-     * Open file for spout
-     *
-     * @throws \LogicException if path or file name is not set.
-     */
-    public function openFile(): void
+	/**
+	 * @return StringCell[]
+	 */
+	public function getEmptyValueArray(bool $with_spaces = false): array
     {
-        if ($this->file_path === null || $this->file_name === null) {
-            throw new \LogicException(__METHOD__ . " path or filename is not set.");
+        $text = "";
+        if($with_spaces) {
+            $text = " ";
         }
 
-        $this->writer->openToFile($this->getFilePath());
-    }
+        $cell = new StringCell($text, null);
+		$ret = [];
+		for ($i=0; $i < $this->max_column_count; $i++) {
+            $ret = $cell;
+		}
 
-    /**
-     * Set the number of columns the sheet will be filled in
-     */
-    public function setMaximumColumnCount(int $max_column_count): void
+		return $ret;
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function createSheet(string $sheet_name): void
     {
-        $this->max_column_count = $max_column_count;
-    }
+		$new_sheet = $this->writer->addNewSheetAndMakeItCurrent();
+		$new_sheet->setName($sheet_name);
+	}
 
-    /**
-     * Get a values array according to max column count
-     *
-     * @return Cell[]
-     */
-    protected function getEmptyValueArray(bool $with_spaces = false): array
+	/**
+	 * @inheritdoc
+	 */
+	public function selectSheet(string $sheet_name): void
     {
-        $ret = [];
-        for ($i = 0; $i < $this->max_column_count; $i++) {
-            if ($with_spaces) {
-                $ret[] = new Cell(' ');
-            } else {
-                $ret[] = new Cell('');
-            }
-        }
+	}
 
-        return $ret;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setFileName(string $file_name): void
+	/**
+	 * @inheritdoc
+	 */
+	public function setColumnStyle(string $column, SPOUT_STYLE $style): void
     {
-        $this->file_name = $file_name;
-    }
+		$this->style = $style;
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function setPath(string $file_path): void
+	/**
+	 * @inheritdoc
+	 */
+	public function addRow(array $values): void
     {
-        $this->file_path = $file_path;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function createSheet(string $sheet_name): void
-    {
-        $new_sheet = $this->writer->addNewSheetAndMakeItCurrent();
-        $new_sheet->setName($sheet_name);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function selectSheet(string $sheet_name): void
-    {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setColumnStyle(string $column, Style $style): void
-    {
-        $this->style = $style;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function addRow(array $values): void
-    {
-        $cells = array_map(
-            fn ($value) => new Cell($value),
+        $values = array_map(
+            fn ($v) => new StringCell($v, null),
             $values
         );
-        $row = new Row($cells, $this->style);
-        $this->writer->addRow($row);
-    }
+        $row = new Row($values, $this->style);
+		$this->writer->addRow($row);
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function addSeperatorRow(): void
+	/**
+	 * @inheritdoc
+	 */
+	public function addSeparatorRow(): void
     {
-        $border_top = new BorderPart('top');
-        $border = new Border([$border_top]);
-        $style = new Style();
-        $style->setBorder($border);
+        $style = new SPOUT_STYLE();
+        $part = new BorderPart(SPOUT_BORDER::BOTTOM);
+        $spout_border = new SPOUT_BORDER($part);
+        $style->setBorder($spout_border);
 
-        $row = new Row($this->getEmptyValueArray(true), $style);
-        $this->writer->addRow($row);
-    }
+		$this->writer->addRow(new Row($this->getEmptyValueArray(true), $style));
+	}
 
-    /**
-     * @inheritdoc
-     */
-    public function addEmptyRow(): void
+	/**
+	 * Add new empty row
+	 */
+	public function addEmptyRow(): void
     {
-        $row = new Row([], null);
-        $this->writer->addRow($row);
-    }
+		$this->writer->addRow(new Row($this->getEmptyValueArray(), null));
+	}
 
-    /**
-     * @inheritdoc
-     */
     public function saveFile(): void
     {
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function close(): void
+	/**
+	 * @inheritdoc
+	 */
+	public function close(): void
     {
-        $this->writer->close();
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function getFilePath(): string
-    {
-        return ($this->file_path ?? '') . ($this->file_name ?? '');
-    }
+		$this->writer->close();
+	}
 }

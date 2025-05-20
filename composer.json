@@ -8,9 +8,6 @@
 			"CaT\\Libs\\ExcelWrapper\\" : "./src"
 		}
 	},
-	"require": {
-		"box/spout": "3.2.*"
-	},
 	"config" : {
 		"autoloader-suffix" : "ExcelWrapper"
 	},
@@ -19,11 +16,7 @@
 		"sensiolabs/security-checker": "^4.1",
 		"phpunit/phpunit": "^9.5"
 	},
-	"extra": {
-		"box/spout" : {
-			"source" : "https://github.com/box/spout",
-			"used_version" : "v3.2.0",
-			"wrapped_by" : null
-		}
+	"require": {
+		"openspout/openspout": "^4.28"
 	}
 }

@@ -1,18 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
 use CaT\Libs\ExcelWrapper\Reader;
-use CaT\Libs\ExcelWrapper\XLSXReader;
-use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use OpenSpout\Reader\ReaderInterface;
+use OpenSpout\Reader\XLSX\Reader as XLSXReader;
 
-class SpoutXLSXReader extends SpoutAbstractReader implements XLSXReader
+class SpoutXLSXReader extends SpoutAbstractReader implements Reader
 {
-    public function __construct()
-    {
-        $this->reader = ReaderEntityFactory::createXLSXReader();
-    }
-
     public function selectSheet(int $sheet_number): void
     {
         $this->sheet_iterator->rewind();
@@ -37,5 +34,10 @@ class SpoutXLSXReader extends SpoutAbstractReader implements XLSXReader
         $this->row_iterator = $this->sheet_iterator->current()->getRowIterator();
         $this->row_iterator->rewind();
         return true;
+    }
+
+    protected function initReader(): void
+    {
+        $this->reader = new XLSXReader();
     }
 }

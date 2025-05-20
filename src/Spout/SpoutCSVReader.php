@@ -1,31 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
-use \CaT\Libs\ExcelWrapper\Reader;
-use \CaT\Libs\ExcelWrapper\CSVReader;
-use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use OpenSpout\Common\Helper\EncodingHelper;
+use OpenSpout\Reader\CSV\Reader as CSVReader;
+use OpenSpout\Reader\CSV\Options as CSVOptions;
+use OpenSpout\Reader\ReaderInterface;
 
-class SpoutCSVReader extends SpoutAbstractReader implements CSVReader
+class SpoutCSVReader extends SpoutAbstractReader
 {
-    public function __construct()
-    {
-        $this->reader = ReaderEntityFactory::createCSVReader();
+    public function __construct(
+        protected string $fieldDelimiter = ',',
+        protected string $fieldEnclosure = '"',
+        protected string $encoding = EncodingHelper::ENCODING_UTF8,
+    ) {
     }
 
-    public function setFieldDelimiter(string $fieldDelimiter): void
+    protected function initReader(): void
     {
-        $this->reader->setFieldDelimiter($fieldDelimiter);
-
-    }
-
-    public function setFieldEnclosure(string $fieldEnclosure): void
-    {
-        $this->reader->setFieldEnclosure($fieldEnclosure);
-    }
-
-    public function setEncoding(string $encoding): void
-    {
-        $this->reader->setEncoding($encoding);
+        $options = new CSVOptions();
+        $options->FIELD_DELIMITER = $this->fieldDelimiter;
+        $options->FIELD_ENCLOSURE = $this->fieldEnclosure;
+        $options->ENCODING = $this->encoding;
+        $this->reader = new CSVReader($options);
     }
 }

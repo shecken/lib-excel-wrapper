@@ -1,26 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
 use CaT\Libs\ExcelWrapper\Reader;
-use \Box\Spout\Reader\ReaderInterface;
-use \Box\Spout\Common\Entity\Row;
+use OpenSpout\Reader\Common\Creator\ReaderFactory;
+use OpenSpout\Reader\Exception\ReaderNotOpenedException;
+use OpenSpout\Reader\ReaderInterface;
 
 abstract class SpoutAbstractReader implements Reader
 {
-    protected ReaderInterface $reader;
+    protected ?ReaderInterface $reader = null;
     protected \Iterator $sheet_iterator;
     protected \Iterator $row_iterator;
 
     public function open(string $file_path): void
     {
-        $this->reader->open($file_path);
+        $this->initReader();
+        $this->getReader()->open($file_path);
         $this->initIterators();
     }
 
     public function close(): void
     {
-        $this->reader->close();
+        $this->getReader()->close();
     }
 
     public function getFirstRow(): ?array
@@ -48,12 +52,22 @@ abstract class SpoutAbstractReader implements Reader
         return $row;
     }
 
-    protected function initIterators()
+    protected function initIterators(): void
     {
-        $this->sheet_iterator = $this->reader->getSheetIterator();
+        $this->sheet_iterator = $this->getReader()->getSheetIterator();
         $this->sheet_iterator->rewind();
         $this->row_iterator = $this->sheet_iterator->current()->getRowIterator();
         $this->row_iterator->rewind();
     }
+
+    protected function getReader(): ReaderInterface
+    {
+        if(is_null($this->reader)) {
+            throw new ReaderNotOpenedException();
+        }
+        return $this->reader;
+    }
+
+    protected abstract function initReader(): void;
 }
 

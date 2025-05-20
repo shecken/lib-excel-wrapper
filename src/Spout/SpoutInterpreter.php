@@ -1,17 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
 use \CaT\Libs\ExcelWrapper\Style as CatStyle;
-use Box\Spout\Common\Entity\Style\Style as SpoutStyle;
-use Box\Spout\Common\Entity\Style\Border;
-use Box\Spout\Common\Entity\Style\BorderPart;
+use OpenSpout\Common\Entity\Style\Style as SpoutStyle;
+use OpenSpout\Common\Entity\Style\Border;
+use OpenSpout\Common\Entity\Style\BorderPart;
 
 class SpoutInterpreter
 {
-    /**
-     * Interpret a style object
-     */
     public function interpret(CatStyle $style): SpoutStyle
     {
         $spout_style = (new SpoutStyle())
@@ -35,7 +34,7 @@ class SpoutInterpreter
 
         if ($style->getVerticalLine()) {
             $border_right = new BorderPart('right');
-            $border = new Border([$border_right]);
+            $border = new Border($border_right);
             $spout_style = $spout_style->setBorder($border);
         }
 
