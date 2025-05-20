@@ -1,175 +1,192 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper;
 
-/**
- * Immutable class for styling a column.
- * This describes functions to style a column in a sheet.
- *
- * @author Stefan Hecken    <stefan.hecken@concepts-and-training.de>
- */
-class Style
-{
-    const ORIENTATION_LEFT = "left";
-    const ORIENTATION_RIGHT = "right";
-    const ORIENTATION_CENTER = "center";
-    const ORIENTATION_BLOCK = "block";
-    const COLOR_REG_EXP = "/^[A-Fa-f0-9]{6}$/i";
+class Style {
+	const ORIENTATION_LEFT = "left";
+	const ORIENTATION_RIGHT = "right";
+	const ORIENTATION_CENTER = "center";
+	const ORIENTATION_BLOCK = "block";
 
-    protected string $font_family;
-    protected int $font_size;
-    protected bool $bold;
-    protected bool $italic;
-    protected bool $underline;
-    protected string $text_color;
-    protected string $background_color;
-    protected bool $horizontal_line;
-    protected bool $vertical_line;
-    protected string $orientation;
+	const COLOR_REG_EXP = "/^[A-Fa-f0-9]{6}$/i";
 
-    public function __construct(
-        string $font_family = "Arial",
-        int    $font_size = 10,
-        bool   $bold = false,
-        bool   $italic = false,
-        bool   $underline = false,
-        string $text_color = "000000",
-        string $background_color = "ffffff",
-        bool   $horizontal_line = false,
-        string $orientation = self::ORIENTATION_LEFT,
-        bool   $vertical_line = false
-    )
-    {
-        $this->font_family = $font_family;
-        $this->font_size = $font_size;
-        $this->bold = $bold;
-        $this->italic = $italic;
-        $this->underline = $underline;
-        $this->text_color = $text_color;
-        $this->background_color = $background_color;
-        $this->horizontal_line = $horizontal_line;
-        $this->orientation = $orientation;
-        $this->vertical_line = $vertical_line;
+	public function __construct(
+        protected string $font_family = "Arial",
+		protected int    $font_size = 10,
+		protected bool   $bold = false,
+		protected bool   $italic = false,
+        protected bool   $underlined = false,
+        protected string $text_color = "000000",
+        protected string $background_color = "ffffff",
+        protected bool   $vertical_line = false,
+        protected string $orientation = self::ORIENTATION_LEFT
+	) {
+        if (!$this->validateOrientation($orientation)) {
+            throw new \InvalidArgumentException("Orientation '{$orientation}' is not valid");
+        }
+
+        if (!$this->validateColor($background_color)) {
+            throw new \InvalidArgumentException("Background color '{$background_color}' is not valid");
+        }
+
+        if (!$this->validateColor($text_color)) {
+            throw new \InvalidArgumentException("Text color '{$text_color}' is not valid");
+        }
+
+        if($font_size <= 0) {
+            throw new \InvalidArgumentException("Font size must be greater than 0");
+        }
+
+        if ($font_family === "") {
+            throw new \InvalidArgumentException("Font family cannot be empty");
+        }
     }
 
-    public function getFontFamily(): string
+	public function getFontFamily(): string
     {
-        return $this->font_family;
-    }
+		return $this->font_family;
+	}
 
-    public function getFontSize(): int
+	public function getFontSize(): int
     {
-        return $this->font_size;
-    }
+		return $this->font_size;
+	}
 
-    public function getBold(): bool
+	public function getBold(): bool
     {
-        return $this->bold;
-    }
+		return $this->bold;
+	}
 
-    public function getItalic(): bool
+	public function getItalic(): bool
     {
-        return $this->italic;
-    }
+		return $this->italic;
+	}
 
-    public function getUnderline(): bool
+	public function getUnderline(): bool
     {
-        return $this->underline;
-    }
+		return $this->underlined;
+	}
 
-    public function getTextColor(): string
+	public function getTextColor(): string
     {
-        return $this->text_color;
-    }
+		return $this->text_color;
+	}
 
-    public function getBackgroundColor(): string
+	public function getBackgroundColor(): string
     {
-        return $this->background_color;
-    }
+		return $this->background_color;
+	}
 
-    public function getVerticalLine(): bool
+	public function getVerticalLine(): bool
     {
-        return $this->vertical_line;
-    }
+		return $this->vertical_line;
+	}
 
-    public function getOrientation(): string
+	public function getOrientation(): string
     {
-        return $this->orientation;
-    }
+		return $this->orientation;
+	}
 
-    public function withFontFamily(string $font_family): self
+	public function withFontFamily(string $font_family): self
     {
-        $clone = clone $this;
-        $clone->font_family = $font_family;
-        return $clone;
-    }
+		if ($font_family === "") {
+            throw new \InvalidArgumentException("Font family cannot be empty");
+        }
 
-    public function withFontSize(int $font_size): self
-    {
-        $clone = clone $this;
-        $clone->font_size = $font_size;
-        return $clone;
-    }
+		$clone = clone $this;
+		$clone->font_family = $font_family;
+		return $clone;
+	}
 
-    public function withBold(bool $bold): self
+	public function withFontSize(int $font_size): self
     {
-        $clone = clone $this;
-        $clone->bold = $bold;
-        return $clone;
-    }
+        if($font_size <= 0) {
+            throw new \InvalidArgumentException("Font size must be greater than 0");
+        }
 
-    public function withItalic(bool $italic): self
-    {
-        $clone = clone $this;
-        $clone->italic = $italic;
-        return $clone;
-    }
+		$clone = clone $this;
+		$clone->font_size = $font_size;
+		return $clone;
+	}
 
-    public function withUnderline(bool $underline): self
+	public function withBold(bool $bold): self
     {
-        $clone = clone $this;
-        $clone->underline = $underline;
-        return $clone;
-    }
+		$clone = clone $this;
+		$clone->bold = $bold;
+		return $clone;
+	}
 
-    public function withTextColor(string $text_color): self
+	public function withItalic(bool $italic): self
     {
-        assert('$this->validateColor($text_color)');
-        $clone = clone $this;
-        $clone->text_color = $text_color;
-        return $clone;
-    }
+		$clone = clone $this;
+		$clone->italic = $italic;
+		return $clone;
+	}
 
-    public function withBackgroundColor(string $background_color): self
+	public function withUnderline(bool $underline): self
     {
-        assert('$this->validateColor($background_color)');
-        $clone = clone $this;
-        $clone->background_color = $background_color;
-        return $clone;
-    }
+		$clone = clone $this;
+		$clone->underlined = $underline;
+		return $clone;
+	}
 
-    public function withVerticalLine(bool $vertical_line): self
+	public function withTextColor(string $text_color): self
     {
-        $clone = clone $this;
-        $clone->vertical_line = $vertical_line;
-        return $clone;
-    }
+        if (!$this->validateColor($text_color)) {
+            throw new \InvalidArgumentException("Text color '{$text_color}' is not valid");
+        }
 
-    public function withOrientation(string $orientation): self
-    {
-        assert('$this->validateOrientation($orientation)');
-        $clone = clone $this;
-        $clone->orientation = $orientation;
-        return $clone;
-    }
+		$clone = clone $this;
+		$clone->text_color = $text_color;
+		return $clone;
+	}
 
-    protected function validateColor(string $color_code): bool
+	public function withBackgroundColor(string $background_color): self
     {
-        return (bool)preg_match(self::COLOR_REG_EXP, $color_code);
-    }
+        if (!$this->validateColor($background_color)) {
+            throw new \InvalidArgumentException("Background color '{$background_color}' is not valid");
+        }
 
-    protected function validateOrientation(string $orientation): bool
+		$clone = clone $this;
+		$clone->background_color = $background_color;
+		return $clone;
+	}
+
+	public function withVerticalLine(bool $vertical_line): self
     {
-        return in_array($orientation, [self::ORIENTATION_LEFT, self::ORIENTATION_RIGHT, self::ORIENTATION_CENTER, self::ORIENTATION_BLOCK]);
-    }
+		$clone = clone $this;
+		$clone->vertical_line = $vertical_line;
+		return $clone;
+	}
+
+	public function withOrientation(string $orientation): self
+    {
+		if (!$this->validateOrientation($orientation)) {
+            throw new \InvalidArgumentException("Orientation '{$orientation}' is not valid");
+        }
+
+		$clone = clone $this;
+		$clone->orientation = $orientation;
+		return $clone;
+	}
+
+	protected function validateColor(string $color_code): bool
+    {
+		return (bool)preg_match(self::COLOR_REG_EXP, $color_code);
+	}
+
+	protected function validateOrientation(string $orientation): bool
+    {
+		return in_array(
+            $orientation,
+            array(
+                self::ORIENTATION_LEFT,
+                self::ORIENTATION_RIGHT,
+                self::ORIENTATION_CENTER,
+                self::ORIENTATION_BLOCK
+            )
+        );
+	}
 }

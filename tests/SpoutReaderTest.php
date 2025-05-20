@@ -78,8 +78,8 @@ class SpoutReaderTest extends TestCase
         $this->assertIsString($row[0]);
         $this->assertIsInt($row[1]);
         $this->assertIsFloat($row[2]);
-        $this->assertInstanceOf('DateTime', $row[3]);
-        $this->assertEquals(['Milk', 12345, 2.5, new DateTime('2024-01-24')], $row);
+        $this->assertInstanceOf('DateTimeImmutable', $row[3]);
+        $this->assertEquals(['Milk', 12345, 2.5, new DateTimeImmutable('2024-01-24')], $row);
         $this->xlsx_reader->close();
     }
 }
