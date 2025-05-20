@@ -1,15 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
-use Box\Spout\Common\Entity\Cell;
-use \CaT\Plugins\MateriaList\ilActions;
+use OpenSpout\Common\Entity\Cell;
 use \CaT\Libs\ExcelWrapper\Writer;
 
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Writer\WriterInterface;
-use Box\Spout\Common\Entity\Style\Style;
+use OpenSpout\Writer\Common\Creator\WriterFactory;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Writer\WriterInterface;
+use OpenSpout\Common\Entity\Style\Style;
 
 /**
  * Export a single material list
@@ -22,7 +23,7 @@ class SpoutCSVWriter implements Writer
 
     public function __construct()
     {
-        $this->writer = WriterEntityFactory::createCSVWriter();
+        $this->writer = WriterFactory::createFromFile();
     }
 
     /**

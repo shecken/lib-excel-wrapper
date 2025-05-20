@@ -33,7 +33,7 @@ interface Writer
     /**
      * Set the style for a single column
      */
-    public function setColumnStyle(string $column, \Box\Spout\Common\Entity\Style\Style $style): void;
+    public function setColumnStyle(string $column, \OpenSpout\Common\Entity\Style\Style $style): void;
 
     /**
      * Add a new row to the current sheet.

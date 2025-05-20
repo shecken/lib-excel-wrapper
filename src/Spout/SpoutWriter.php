@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace CaT\Libs\ExcelWrapper\Spout;
 
-use \CaT\Plugins\MateriaList\ilActions;
 use \CaT\Libs\ExcelWrapper\Writer;
 
-use Box\Spout\Writer\Common\Creator\WriterEntityFactory;
-use Box\Spout\Common\Entity\Row;
-use Box\Spout\Common\Entity\Cell;
-use Box\Spout\Writer\WriterInterface;
-use Box\Spout\Common\Entity\Style\Style;
-use Box\Spout\Common\Entity\Style\Border;
-use Box\Spout\Common\Entity\Style\BorderPart;
+use OpenSpout\Writer\Common\Creator\WriterFactory;
+use OpenSpout\Common\Entity\Row;
+use OpenSpout\Common\Entity\Cell;
+use OpenSpout\Writer\WriterInterface;
+use OpenSpout\Common\Entity\Style\Style;
+use OpenSpout\Common\Entity\Style\Border;
+use OpenSpout\Common\Entity\Style\BorderPart;
 
 /**
  * Export a single material list
@@ -26,7 +27,7 @@ class SpoutWriter implements Writer
 
     public function __construct()
     {
-        $this->writer = WriterEntityFactory::createXLSXWriter();
+        $this->writer = WriterFactory::createFromFile();
     }
 
     /**

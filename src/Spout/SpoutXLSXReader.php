@@ -4,7 +4,7 @@ namespace CaT\Libs\ExcelWrapper\Spout;
 
 use CaT\Libs\ExcelWrapper\Reader;
 use CaT\Libs\ExcelWrapper\XLSXReader;
-use \Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+use \OpenSpout\Reader\Common\Creator\ReaderEntityFactory;
 
 class SpoutXLSXReader extends SpoutAbstractReader implements XLSXReader
 {

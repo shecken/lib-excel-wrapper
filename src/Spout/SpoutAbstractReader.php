@@ -3,8 +3,8 @@
 namespace CaT\Libs\ExcelWrapper\Spout;
 
 use CaT\Libs\ExcelWrapper\Reader;
-use \Box\Spout\Reader\ReaderInterface;
-use \Box\Spout\Common\Entity\Row;
+use \OpenSpout\Reader\ReaderInterface;
+use \OpenSpout\Common\Entity\Row;
 
 abstract class SpoutAbstractReader implements Reader
 {
