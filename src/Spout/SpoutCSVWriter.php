@@ -63,7 +63,7 @@ class SpoutCSVWriter implements Writer
     public function addRow(array $values): void
     {
         $cells = array_map(
-            fn ($value) => new StringCell($value, null),
+            fn ($value) => new StringCell((string) $value, null),
             $values
         );
         $row = new Row($cells, null);

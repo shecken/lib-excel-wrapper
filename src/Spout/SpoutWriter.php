@@ -47,7 +47,7 @@ class SpoutWriter implements Writer
         $cell = new StringCell($text, null);
 		$ret = [];
 		for ($i=0; $i < $this->max_column_count; $i++) {
-            $ret = $cell;
+            $ret[] = $cell;
 		}
 
 		return $ret;
@@ -83,7 +83,7 @@ class SpoutWriter implements Writer
 	public function addRow(array $values): void
     {
         $values = array_map(
-            fn ($v) => new StringCell($v, null),
+            fn ($v) => new StringCell((string) $v, null),
             $values
         );
         $row = new Row($values, $this->style);
